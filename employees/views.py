@@ -508,8 +508,8 @@ def espace_employe(request):
                 conge.employee = employee
                 conge.status   = 'En attente'
                 conge.save()
-                notifier_rh(f"🏖️ {employee.name} a soumis une demande de congé du {conge.date_debut} au {conge.date_fin}.")
-                messages.success(request, 'Demande envoyée ✅')
+                notifier_rh(f" {employee.name} a soumis une demande de congé du {conge.date_debut} au {conge.date_fin}.")
+                messages.success(request, 'Demande envoyée ')
                 return redirect('/mon-espace/?tab=conge')
 
         elif 'add_document' in request.POST:
@@ -518,8 +518,8 @@ def espace_employe(request):
             fichier  = request.FILES.get('fichier')
             if nom and type_doc and fichier:
                 Document(employee=employee, nom=nom, type_doc=type_doc, fichier=fichier).save()
-                notifier_rh(f"📄 {employee.name} a ajouté un document : {nom}")
-                messages.success(request, 'Document ajouté ✅')
+                notifier_rh(f" {employee.name} a ajouté un document : {nom}")
+                messages.success(request, 'Document ajouté ')
             else:
                 messages.error(request, 'Veuillez remplir tous les champs du document.')
             return redirect('/mon-espace/?tab=document')
@@ -529,16 +529,16 @@ def espace_employe(request):
             if request.FILES.get('photo'):
                 employee.photo = request.FILES['photo']
             employee.save()
-            notifier_rh(f"✏️ {employee.name} a modifié son profil.")
-            messages.success(request, 'Profil modifié ✅')
+            notifier_rh(f" {employee.name} a modifié son profil.")
+            messages.success(request, 'Profil modifié ')
             return redirect('espace_employe')
 
         elif 'update_info' in request.POST:
             employee_form = EmployeeForm(request.POST, request.FILES, instance=employee)
             if employee_form.is_valid():
                 employee_form.save()
-                notifier_rh(f"✏️ {employee.name} a mis à jour ses informations personnelles.")
-                messages.success(request, 'Informations mises à jour ✅')
+                notifier_rh(f" {employee.name} a mis à jour ses informations personnelles.")
+                messages.success(request, 'Informations mises à jour ')
                 return redirect('espace_employe')
 
     return render(request, 'employees/espace_employe.html', {
