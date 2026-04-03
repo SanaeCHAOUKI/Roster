@@ -162,7 +162,9 @@ class BulletinPaie(models.Model):
 
     def __str__(self):
         return f"{self.employee.name} - {self.mois}/{self.annee}"
-
+    @property
+    def salaire_brut(self):
+        return self.salaire_base + self.primes
 
 # ── Prédiction ─────────────────────────────────────────────────────────────────
 class Prediction(models.Model):

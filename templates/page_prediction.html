@@ -1,198 +1,186 @@
 {% extends 'employees/base_rh.html' %}
 {% load static %}
 
-
 {% block content %}
-<h1>Prédictions </h1>
-<br>
 <style>
-/* ══ BANNER RÉSULTAT (bandeau vert/rouge en haut) ══ */
-.pred-banner {
-  padding: 14px 20px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  border: 1px solid;
-}
-.pred-banner.stable { background: #f0fdf4; border-color: #86efac; color: #166534; }
-.pred-banner.risk   { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
-
-/* ══ CARTE RÉSULTAT ══ */
+/* ══ RÉSULTAT ══ */
 .result-card {
   background: #fff;
   border-radius: 14px;
-  padding: 28px 32px;
+  padding: 24px 28px;
   margin-bottom: 24px;
-  box-shadow: 0 1px 4px rgba(0,0,0,.06);
-  border: 1.5px solid;
+  box-shadow: 0 2px 12px rgba(0,0,0,.07);
+  border-left: 5px solid #e2e8f0;
 }
-.result-card.stable { border-color: #86efac; }
-.result-card.risk   { border-color: #fca5a5; }
+.result-card.risk    { border-left-color: #ef4444; }
+.result-card.stable  { border-left-color: #10b981; }
 
-.result-top {
+.result-header {
   display: flex;
-  align-items: flex-start;
-  gap: 18px;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
-/* Icône ronde verte/rouge */
-.result-check {
-  width: 48px; height: 48px;
-  border-radius: 50%;
+.result-icon {
+  width: 60px; height: 60px;
+  border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  font-size: 22px;
+  font-size: 26px;
 }
-.result-check.stable { background: #22c55e; color: #fff; }
-.result-check.risk   { background: #ef4444; color: #fff; }
+.result-icon.risk   { background: #fef2f2; color: #ef4444; }
+.result-icon.stable { background: #f0fdf4; color: #10b981; }
 
-.result-name    { font-size: 20px; font-weight: 800; color: #0f172a; }
-.result-verdict { font-size: 14px; font-weight: 600; margin-top: 4px; }
-.result-verdict.stable { color: #16a34a; }
-.result-verdict.risk   { color: #dc2626; }
-.result-sub     { font-size: 12px; color: #94a3b8; margin-top: 3px; }
+.result-name {
+  font-size: 20px; font-weight: 800;
+  color: #0f172a;
+}
+.result-verdict {
+  font-size: 15px; font-weight: 700; margin-top: 3px;
+}
+.result-verdict.risk   { color: #ef4444; }
+.result-verdict.stable { color: #10b981; }
+.result-meta { font-size: 12px; color: #64748b; margin-top: 3px; }
 
-/* Score à droite */
 .result-score {
   margin-left: auto;
   text-align: center;
-  flex-shrink: 0;
   min-width: 110px;
 }
-.score-pct {
-  font-size: 52px; font-weight: 800; line-height: 1;
+.score-big {
+  font-size: 48px; font-weight: 800; line-height: 1;
 }
-.score-pct.low    { color: #10b981; }
-.score-pct.medium { color: #f97316; }
-.score-pct.high   { color: #ef4444; }
-.score-lbl { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+.score-big.high   { color: #ef4444; }
+.score-big.medium { color: #f97316; }
+.score-big.low    { color: #10b981; }
+.score-sub { font-size: 11px; color: #94a3b8; margin-top: 3px; }
 
-/* Badge Satisfaisant / À surveiller */
-.score-badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  margin-top: 8px;
-  padding: 5px 12px; border-radius: 8px;
-  font-size: 12px; font-weight: 600;
+.result-bar-wrap { margin-top: 18px; }
+.result-bar-labels {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: #94a3b8; margin-bottom: 5px;
 }
-.score-badge.ok      { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
-.score-badge.warning { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; }
-
-/* Barre de progression */
-.prog-wrap    { margin-top: 20px; }
-.prog-labels  { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-bottom: 6px; }
-.prog-track   { height: 10px; background: #f1f5f9; border-radius: 99px; overflow: hidden; position: relative; }
-.prog-fill    { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#10b981 0%,#f97316 55%,#ef4444 100%); }
-/* Curseur point orange sur la barre */
-.prog-cursor  {
-  position: absolute; top: 50%; transform: translate(-50%,-50%);
-  width: 12px; height: 12px; border-radius: 50%;
-  background: #f97316; border: 2px solid #fff;
-  box-shadow: 0 0 0 2px #f97316;
+.result-bar-track {
+  height: 12px; background: #f1f5f9;
+  border-radius: 99px; overflow: hidden;
+}
+.result-bar-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, #10b981 0%, #f97316 60%, #ef4444 100%);
+  transition: width .6s ease;
 }
 
-/* Alerte risque */
-.risk-alert {
+.result-alert {
   margin-top: 14px;
   padding: 12px 16px;
   border-radius: 10px;
   font-size: 13px; font-weight: 600;
-  display: flex; align-items: center; gap: 8px;
 }
-.risk-alert.low    { background: #f0fdf4; color: #166534; }
-.risk-alert.medium { background: #fff7ed; color: #9a3412; }
-.risk-alert.high   { background: #fef2f2; color: #991b1b; }
+.result-alert.high   { background: #fef2f2; color: #991b1b; }
+.result-alert.medium { background: #fff7ed; color: #9a3412; }
+.result-alert.low    { background: #f0fdf4; color: #065f46; }
 
-/* Boutons résultat */
-.result-btns { display: flex; gap: 10px; margin-top: 20px; }
+.result-actions {
+  display: flex; gap: 10px; margin-top: 16px;
+}
 
 /* ══ FORM CARD ══ */
-.pred-form-card {
+.pred-card {
   background: #fff;
   border-radius: 14px;
-  padding: 28px 32px;
-  box-shadow: 0 1px 4px rgba(0,0,0,.06);
-  border: 1px solid #e2e8f0;
+  padding: 24px 28px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.07);
 }
 
-.pred-form-title { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 2px; }
-.pred-form-sub   { font-size: 12px; color: #94a3b8; margin-bottom: 22px; }
+.pred-card-title {
+  font-size: 17px; font-weight: 700; color: #0f172a;
+  margin-bottom: 4px;
+}
+.pred-card-sub {
+  font-size: 12px; color: #64748b;
+  margin-bottom: 22px;
+}
 
-/* Section blocs */
+/* ══ SECTION BLOC ══ */
 .pred-section {
   background: #f8fafc;
-  border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 18px 20px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+  border: 1px solid #e2e8f0;
 }
 
-.pred-section-hd {
-  display: flex; align-items: center; gap: 10px;
+.pred-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 16px;
 }
 
-.pred-section-ico {
-  width: 30px; height: 30px; border-radius: 8px;
+.pred-section-icon {
+  width: 32px; height: 32px;
+  border-radius: 9px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 14px; flex-shrink: 0;
-}
-/* Alternance bleu / violet */
-.ico-blue   { background: #eff6ff; color: #3b82f6; }
-.ico-violet { background: #eef2ff; color: #6366f1; }
-
-.pred-section-lbl {
-  font-size: 12px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .5px; color: #0f172a;
+  flex-shrink: 0;
+  font-size: 15px;
 }
 
-/* Grille 2 colonnes */
+/* Couleurs des icônes de section — bleu/violet uniquement */
+.pred-section-icon.emp        { background: #eff6ff; color: #3b82f6; }
+.pred-section-icon.personal   { background: #eef2ff; color: #6366f1; }
+.pred-section-icon.work       { background: #eff6ff; color: #3b82f6; }
+.pred-section-icon.salary     { background: #eef2ff; color: #6366f1; }
+.pred-section-icon.experience { background: #eff6ff; color: #3b82f6; }
+.pred-section-icon.perf       { background: #eef2ff; color: #6366f1; }
+
+.pred-section-title {
+  font-size: 13px; font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+
+/* ══ FORM GRID ══ */
 .pred-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px 20px;
+  gap: 14px 20px;
 }
 
-/* Badge chargement */
+.pred-grid.cols-1 { grid-template-columns: 1fr; }
+
+/* ══ BADGE LOAD ══ */
 .load-badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 4px 10px; border-radius: 7px;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 8px;
   font-size: 11px; font-weight: 600;
-  margin-top: 7px;
+  margin-top: 8px;
 }
 .load-badge.loading { background: #dbeafe; color: #1d4ed8; }
 .load-badge.done    { background: #d1fae5; color: #065f46; }
 
-/* Actions submit */
-.pred-submit {
+/* ══ ACTIONS ══ */
+.pred-actions {
   display: flex; gap: 12px;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
-@media(max-width:700px){
+@media (max-width: 700px) {
   .pred-grid { grid-template-columns: 1fr; }
   .result-score { margin-left: 0; }
-  .result-top { flex-wrap: wrap; }
 }
 </style>
 
-<!-- ══ BANDEAU RÉSULTAT ══ -->
+<!-- ══ RÉSULTAT ══ -->
 {% if result %}
-<div class="pred-banner {% if result.resultat == 'Risque de Départ' %}risk{% else %}stable{% endif %}">
-  Prédiction : {% if result.resultat == 'Risque de Départ' %}Risque de Départ{% else %}Reste dans l'entreprise{% endif %} ({{ result.score }}%)
-</div>
+<div class="result-card {% if result.resultat == 'Risque de Départ' %}risk{% else %}stable{% endif %}" style="margin-bottom:24px;">
+  <div class="result-header">
 
-<!-- ══ CARTE RÉSULTAT ══ -->
-<div class="result-card {% if result.resultat == 'Risque de Départ' %}risk{% else %}stable{% endif %}">
-
-  <div class="result-top">
-    <!-- Icône -->
-    <div class="result-check {% if result.resultat == 'Risque de Départ' %}risk{% else %}stable{% endif %}">
-      <i class="bi {% if result.resultat == 'Risque de Départ' %}bi-exclamation-lg{% else %}bi-check-lg{% endif %}"></i>
+    <div class="result-icon {% if result.resultat == 'Risque de Départ' %}risk{% else %}stable{% endif %}">
+      <i class="bi {% if result.resultat == 'Risque de Départ' %}bi-exclamation-triangle-fill{% else %}bi-check-circle-fill{% endif %}"></i>
     </div>
 
-    <!-- Nom + verdict -->
     <div>
       <div class="result-name">{{ result.employee.name }}</div>
       <div class="result-verdict {% if result.resultat == 'Risque de Départ' %}risk{% else %}stable{% endif %}">
@@ -202,43 +190,40 @@
           Cet employé va rester dans l'entreprise
         {% endif %}
       </div>
-      <div class="result-sub">Analyse par régression logistique</div>
+      <div class="result-meta">Analyse par régression logistique</div>
     </div>
 
-    <!-- Score -->
     <div class="result-score">
-      <div class="score-pct {% if result.score >= 60 %}high{% elif result.score >= 40 %}medium{% else %}low{% endif %}">
+      <div class="score-big {% if result.score >= 60 %}high{% elif result.score >= 40 %}medium{% else %}low{% endif %}">
         {{ result.score }}%
       </div>
-      <div class="score-lbl">Probabilité de départ</div>
-      <div>
+      <div class="score-sub">Probabilité de départ</div>
+      <div style="margin-top:8px;">
         {% if result.status == 'Satisfaisant' %}
-          <span class="score-badge ok">
-            <i class="bi bi-check-circle-fill"></i> Satisfaisant
+          <span class="badge badge-green" style="font-size:12px;padding:5px 12px;">
+            <i class="bi bi-check-circle"></i> {{ result.status }}
           </span>
         {% else %}
-          <span class="score-badge warning">
-            <i class="bi bi-exclamation-circle-fill"></i> {{ result.status }}
+          <span class="badge badge-orange" style="font-size:12px;padding:5px 12px;">
+            <i class="bi bi-exclamation-circle"></i> {{ result.status }}
           </span>
         {% endif %}
       </div>
     </div>
+
   </div>
 
-  <!-- Barre de progression -->
-  <div class="prog-wrap">
-    <div class="prog-labels">
-      <span><i class="bi bi-circle-fill" style="color:#10b981;font-size:7px;"></i> Faible (0%)</span>
-      <span><i class="bi bi-circle-fill" style="color:#ef4444;font-size:7px;"></i> Élevé (100%)</span>
+  <div class="result-bar-wrap">
+    <div class="result-bar-labels">
+      <span><i class="bi bi-circle-fill" style="color:#10b981;font-size:8px;"></i> Faible (0%)</span>
+      <span><i class="bi bi-circle-fill" style="color:#ef4444;font-size:8px;"></i> Élevé (100%)</span>
     </div>
-    <div class="prog-track">
-      <div class="prog-fill" style="width:100%;"></div>
-      <div class="prog-cursor" style="left:{{ result.score }}%;"></div>
+    <div class="result-bar-track">
+      <div class="result-bar-fill" style="width:{{ result.score }}%;"></div>
     </div>
   </div>
 
-  <!-- Alerte niveau de risque -->
-  <div class="risk-alert {% if result.score >= 70 %}high{% elif result.score >= 40 %}medium{% else %}low{% endif %}">
+  <div class="result-alert {% if result.score >= 70 %}high{% elif result.score >= 40 %}medium{% else %}low{% endif %}">
     <i class="bi {% if result.score >= 70 %}bi-x-octagon-fill{% elif result.score >= 40 %}bi-exclamation-diamond-fill{% else %}bi-shield-check{% endif %}"></i>
     {% if result.score >= 70 %}
       Risque ÉLEVÉ — Action RH immédiate recommandée.
@@ -249,8 +234,7 @@
     {% endif %}
   </div>
 
-  <!-- Boutons -->
-  <div class="result-btns">
+  <div class="result-actions">
     <a href="{% url 'prediction_list' %}" class="btn btn-outline btn-sm">
       <i class="bi bi-list-ul"></i> Voir toutes les prédictions
     </a>
@@ -258,43 +242,44 @@
       <i class="bi bi-plus-lg"></i> Nouvelle prédiction
     </a>
   </div>
-
 </div>
 {% endif %}
 
 <!-- ══ FORMULAIRE ══ -->
-<div class="pred-form-card">
-  <div class="pred-form-title">
-    Formulaire de Prédiction
+<div class="pred-card">
+  <div class="pred-card-title">
+    <i class="bi bi-cpu" style="color:#3b82f6;"></i> Formulaire de Prédiction
   </div>
-  <div class="pred-form-sub">Sélectionnez un employé — les champs se remplissent automatiquement.</div>
+  <div class="pred-card-sub">Sélectionnez un employé — les champs se remplissent automatiquement.</div>
 
   <form method="post" id="predForm">
     {% csrf_token %}
 
     <!-- Employé -->
     <div class="pred-section">
-      <div class="pred-section-hd">
-       
-        <div class="pred-section-lbl">Employé</div>
+      <div class="pred-section-header">
+        <div class="pred-section-icon emp"><i class="bi bi-person-fill"></i></div>
+        <div class="pred-section-title">Employé</div>
       </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">{{ form.employee.label }}</label>
-        {{ form.employee }}
-        <span id="loadingBadge" class="load-badge loading" style="display:none;">
-          <i class="bi bi-arrow-repeat"></i> Chargement…
-        </span>
-        <span id="filledBadge" class="load-badge done" style="display:none;">
-          <i class="bi bi-check-lg"></i> Données chargées automatiquement
-        </span>
+      <div class="pred-grid cols-1">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">{{ form.employee.label }}</label>
+          {{ form.employee }}
+          <span id="loadingBadge" class="load-badge loading" style="display:none;">
+            <i class="bi bi-arrow-repeat"></i> Chargement des données…
+          </span>
+          <span id="filledBadge" class="load-badge done" style="display:none;">
+            <i class="bi bi-check-lg"></i> Données chargées automatiquement
+          </span>
+        </div>
       </div>
     </div>
 
     <!-- Informations personnelles -->
     <div class="pred-section">
-      <div class="pred-section-hd">
-        
-        <div class="pred-section-lbl">Informations personnelles</div>
+      <div class="pred-section-header">
+        <div class="pred-section-icon personal"><i class="bi bi-person-vcard-fill"></i></div>
+        <div class="pred-section-title">Informations personnelles</div>
       </div>
       <div class="pred-grid">
         <div class="form-group"><label class="form-label">{{ form.Age.label }}</label>{{ form.Age }}</div>
@@ -308,9 +293,9 @@
 
     <!-- Poste & Travail -->
     <div class="pred-section">
-      <div class="pred-section-hd">
-        
-        <div class="pred-section-lbl">Poste &amp; Travail</div>
+      <div class="pred-section-header">
+        <div class="pred-section-icon work"><i class="bi bi-briefcase-fill"></i></div>
+        <div class="pred-section-title">Poste &amp; Travail</div>
       </div>
       <div class="pred-grid">
         <div class="form-group"><label class="form-label">{{ form.Department.label }}</label>{{ form.Department }}</div>
@@ -323,9 +308,9 @@
 
     <!-- Rémunération -->
     <div class="pred-section">
-      <div class="pred-section-hd">
-  
-        <div class="pred-section-lbl">Rémunération</div>
+      <div class="pred-section-header">
+        <div class="pred-section-icon salary"><i class="bi bi-currency-dollar"></i></div>
+        <div class="pred-section-title">Rémunération</div>
       </div>
       <div class="pred-grid">
         <div class="form-group"><label class="form-label">{{ form.MonthlyIncome.label }}</label>{{ form.MonthlyIncome }}</div>
@@ -339,9 +324,9 @@
 
     <!-- Expérience -->
     <div class="pred-section">
-      <div class="pred-section-hd">
-    
-        <div class="pred-section-lbl">Expérience</div>
+      <div class="pred-section-header">
+        <div class="pred-section-icon experience"><i class="bi bi-graph-up-arrow"></i></div>
+        <div class="pred-section-title">Expérience</div>
       </div>
       <div class="pred-grid">
         <div class="form-group"><label class="form-label">{{ form.TotalWorkingYears.label }}</label>{{ form.TotalWorkingYears }}</div>
@@ -356,11 +341,11 @@
 
     <!-- Satisfaction & Performance -->
     <div class="pred-section">
-      <div class="pred-section-hd">
-      
-        <div class="pred-section-lbl">Satisfaction &amp; Performance</div>
+      <div class="pred-section-header">
+        <div class="pred-section-icon perf"><i class="bi bi-bar-chart-fill"></i></div>
+        <div class="pred-section-title">Satisfaction &amp; Performance</div>
       </div>
-      <div style="font-size:11px;color:#94a3b8;margin:-8px 0 12px;">
+      <div style="font-size:11px;color:#94a3b8;margin-bottom:12px;margin-top:-8px;">
         1 = Très faible &nbsp;·&nbsp; 2 = Faible &nbsp;·&nbsp; 3 = Moyen &nbsp;·&nbsp; 4 = Élevé
       </div>
       <div class="pred-grid">
@@ -373,10 +358,10 @@
       </div>
     </div>
 
-    <!-- Submit -->
-    <div class="pred-submit">
-      <button type="submit" class="btn btn-primary" style="padding:11px 30px;font-size:14px;">
-       Lancer la prédiction
+    <!-- Actions -->
+    <div class="pred-actions">
+      <button type="submit" class="btn btn-primary" style="padding:12px 32px;font-size:14px;">
+        <i class="bi bi-cpu"></i> Lancer la prédiction
       </button>
       <a href="{% url 'prediction_list' %}" class="btn btn-outline">Annuler</a>
     </div>
@@ -437,6 +422,7 @@ document.getElementById('id_employee').addEventListener('change', function () {
   if (!empId) return;
   document.getElementById('loadingBadge').style.display = 'inline-flex';
   document.getElementById('filledBadge').style.display  = 'none';
+
   fetch(`/employes/${empId}/data/`)
     .then(r => r.json())
     .then(data => {
@@ -446,7 +432,7 @@ document.getElementById('id_employee').addEventListener('change', function () {
     })
     .catch(err => {
       document.getElementById('loadingBadge').style.display = 'none';
-      console.error('Erreur:', err);
+      console.error('Erreur chargement données:', err);
     });
 });
 </script>

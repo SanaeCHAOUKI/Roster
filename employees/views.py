@@ -1,5 +1,4 @@
 import json
-from urllib import request
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
@@ -37,25 +36,22 @@ def notifier_user(user, message):
 
 
 # ══════════════════════════════════════════════════════════════
-#  LOGIN / LOGOUT (CORRIGÉ)
+#  LOGIN / LOGOUT
 # ══════════════════════════════════════════════════════════════
 def login_view(request):
-    # 🔁 Si déjà connecté
     if request.user.is_authenticated:
         if request.user.is_superuser:
-            return redirect('dashboard')  # ADMIN
+            return redirect('dashboard')
         elif request.user.is_staff:
-            return redirect('page_rh')   # RH ✅ corrigé
+            return redirect('page_rh')
         else:
-            return redirect('espace_employe')  # EMPLOYÉ
+            return redirect('espace_employe')
 
-    # 🔐 Traitement login
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        role = request.POST.get('role')
+        role     = request.POST.get('role')
 
-        # Vérifier rôle sélectionné
         if not role:
             messages.error(request, 'Veuillez sélectionner un rôle.')
             return render(request, 'registration/login.html')
@@ -63,8 +59,6 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-
-            # ───────── ADMIN ─────────
             if role == 'admin':
                 if user.is_superuser:
                     login(request, user)
@@ -72,25 +66,26 @@ def login_view(request):
                 else:
                     messages.error(request, "Ce compte n'a pas les droits d'administrateur.")
 
-            # ───────── RH ─────────
             elif role == 'rh':
-                if user.is_staff and not user.is_superuser:  # ✅ important
+                if user.is_staff and not user.is_superuser:
                     login(request, user)
-                    return redirect('page_rh')  # ✅ corrigé
+                    return redirect('page_rh')
                 else:
                     messages.error(request, "Ce compte n'a pas les droits RH.")
 
-            # ───────── EMPLOYÉ ─────────
             elif role == 'employe':
-                if hasattr(user, 'employee'):  # ✅ mieux que try/except
-                    login(request, user)
-                    return redirect('espace_employe')
-                else:
+                try:
+                    emp = user.employee  # lève RelatedObjectDoesNotExist si pas lié
+                    if emp is not None:
+                        login(request, user)
+                        return redirect('espace_employe')
+                    else:
+                        messages.error(request, "Ce compte n'est pas lié à un employé.")
+                except Exception:
                     messages.error(request, "Ce compte n'est pas lié à un employé.")
 
             else:
                 messages.error(request, "Rôle invalide.")
-
         else:
             messages.error(request, 'Identifiant ou mot de passe incorrect.')
 
@@ -103,7 +98,7 @@ def logout_view(request):
 
 
 # ══════════════════════════════════════════════════════════════
-#  DASHBOARD
+#  DASHBOARD ADMIN
 # ══════════════════════════════════════════════════════════════
 @login_required
 def dashboard(request):
@@ -111,30 +106,31 @@ def dashboard(request):
     conges      = CongeRequest.objects.all()
     bulletins   = BulletinPaie.objects.all()
     predictions = Prediction.objects.all()
-    dept_stats = Department.objects.annotate(emp_count=Count('employee'))
-    
-    # Compter les RH (utilisateurs sans profil employé, exclure superadmin)
-    from django.contrib.auth.models import User
-    total_rh = User.objects.filter(employee__isnull=True, is_superuser=False).count()
-    
-    total_emp  = employees.count() or 1
-    dept_data  = [
-        {'name': d.name, 'count': d.emp_count, 'pct': round(d.emp_count/total_emp*100)}
+    dept_stats  = Department.objects.annotate(emp_count=Count('employee'))
+
+    total_rh  = User.objects.filter(employee__isnull=True, is_superuser=False).count()
+    total_emp = employees.count() or 1
+    dept_data = [
+        {'name': d.name, 'count': d.emp_count, 'pct': round(d.emp_count / total_emp * 100)}
         for d in dept_stats if d.emp_count > 0
     ]
-    
+
     context = {
-        'total_employees': employees.count(),
-        'total_rh': total_rh,  # Ajouté pour les RH
-        'total_conges':    conges.filter(status='En attente').count(),
-        'total_bulletins': bulletins.count(),
-        'total_predictions': predictions.count(),
-        'recent_conges':     conges.order_by('-created_at')[:3],
+        'total_employees':    employees.count(),
+        'total_rh':           total_rh,
+        'total_conges':       conges.filter(status='En attente').count(),
+        'total_bulletins':    bulletins.count(),
+        'total_predictions':  predictions.count(),
+        'recent_conges':      conges.order_by('-created_at')[:3],
         'recent_predictions': predictions.order_by('-created_at')[:3],
-        'dept_data': dept_data,
+        'dept_data':          dept_data,
     }
-    
     return render(request, 'employees/dashboard.html', context)
+
+
+# ══════════════════════════════════════════════════════════════
+#  PAGE RH  ← recent_employees ajouté ici
+# ══════════════════════════════════════════════════════════════
 @login_required
 def page_rh(request):
     """Tableau de bord pour le RH."""
@@ -148,9 +144,10 @@ def page_rh(request):
     dept_stats  = Department.objects.annotate(emp_count=Count('employee'))
     total_emp   = employees.count() or 1
     dept_data   = [
-        {'name': d.name, 'count': d.emp_count, 'pct': round(d.emp_count/total_emp*100)}
+        {'name': d.name, 'count': d.emp_count, 'pct': round(d.emp_count / total_emp * 100)}
         for d in dept_stats if d.emp_count > 0
     ]
+
     context = {
         'total_employees':    employees.count(),
         'total_conges':       conges.filter(status='En attente').count(),
@@ -159,9 +156,11 @@ def page_rh(request):
         'recent_conges':      conges.order_by('-created_at')[:3],
         'recent_bulletins':   bulletins.order_by('-annee', '-mois')[:3],
         'recent_predictions': predictions.order_by('-created_at')[:3],
+        'recent_employees':   employees.select_related('department').order_by('-date_embauche')[:5],  # ← AJOUTÉ
         'dept_data':          dept_data,
     }
     return render(request, 'employees/page_rh.html', context)
+
 
 # ══════════════════════════════════════════════════════════════
 #  EMPLOYÉS
@@ -180,20 +179,17 @@ def employee_add(request):
     if request.method == 'POST':
         form = EmployeeForm(request.POST, request.FILES)
         if form.is_valid():
-            emp = form.save(commit=False)
+            emp      = form.save(commit=False)
             username = request.POST.get('username')
             password = request.POST.get('password')
             if username and password:
                 if User.objects.filter(username=username).exists():
                     messages.error(request, f"L'identifiant '{username}' existe déjà.")
                     return render(request, 'employees/employee_form.html', {'form': form, 'title': 'Ajouter un Employé'})
-                user = User.objects.create_user(username=username, password=password)
+                user     = User.objects.create_user(username=username, password=password)
                 emp.user = user
             emp.save()
-
-            # 🔔 Notification RH : nouvel employé ajouté
             notifier_rh(f"➕ Nouvel employé ajouté : {emp.name} — poste : {emp.poste}")
-
             messages.success(request, f'Employé ajouté. Identifiant: {username} | Mot de passe: {password}')
             return redirect('employee_list')
     else:
@@ -208,14 +204,9 @@ def employee_edit(request, pk):
         form = EmployeeForm(request.POST, request.FILES, instance=emp)
         if form.is_valid():
             form.save()
-
-            # 🔔 Notification RH : employé modifié
             notifier_rh(f"✏️ Fiche de l'employé modifiée : {emp.name}")
-
-            # 🔔 Notification Employé : son profil a été modifié
             if emp.user:
-                notifier_user(emp.user, f"✏️ Votre profil a été mis à jour par les RH.")
-
+                notifier_user(emp.user, "✏️ Votre profil a été mis à jour par les RH.")
             messages.success(request, 'Employé mis à jour.')
             return redirect('employee_list')
     else:
@@ -235,10 +226,10 @@ def employee_delete(request, pk):
 
 @login_required
 def employee_detail(request, pk):
-    emp  = get_object_or_404(Employee, pk=pk)
-    docs = emp.documents.all()
-    conges = CongeRequest.objects.filter(employee=emp).order_by('-created_at')
-    bulletins = BulletinPaie.objects.filter(employee=emp).order_by('-annee', '-mois')
+    emp         = get_object_or_404(Employee, pk=pk)
+    docs        = emp.documents.all()
+    conges      = CongeRequest.objects.filter(employee=emp).order_by('-created_at')
+    bulletins   = BulletinPaie.objects.filter(employee=emp).order_by('-annee', '-mois')
     predictions = Prediction.objects.filter(employee=emp).order_by('-created_at')
     return render(request, 'employees/employee_detail.html', {
         'emp': emp, 'docs': docs, 'conges': conges,
@@ -263,13 +254,10 @@ def document_add(request, emp_pk):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
-            doc = form.save(commit=False)
+            doc          = form.save(commit=False)
             doc.employee = emp
             doc.save()
-
-            # 🔔 Notification RH : nouveau document
             notifier_rh(f"📄 Nouveau document ajouté pour {emp.name} : {doc.nom}")
-
             messages.success(request, 'Document ajouté.')
             return redirect('employee_detail', pk=emp_pk)
     else:
@@ -279,7 +267,7 @@ def document_add(request, emp_pk):
 
 @login_required
 def document_delete(request, pk):
-    doc = get_object_or_404(Document, pk=pk)
+    doc    = get_object_or_404(Document, pk=pk)
     emp_pk = doc.employee.pk
     if request.method == 'POST':
         doc.fichier.delete(save=False)
@@ -303,10 +291,7 @@ def conge_add(request):
         form = CongeForm(request.POST)
         if form.is_valid():
             conge = form.save()
-
-            # 🔔 Notification RH : nouvelle demande de congé
             notifier_rh(f"🏖️ Nouvelle demande de congé : {conge.employee.name} du {conge.date_debut} au {conge.date_fin}")
-
             messages.success(request, 'Demande de congé ajoutée.')
             return redirect('conge_list')
     else:
@@ -316,18 +301,15 @@ def conge_add(request):
 
 @login_required
 def conge_update_status(request, pk, status):
-    conge = get_object_or_404(CongeRequest, pk=pk)
+    conge        = get_object_or_404(CongeRequest, pk=pk)
     conge.status = status
     conge.save()
-
-    # 🔔 Notification Employé : statut de son congé mis à jour
     if conge.employee.user:
         emoji = "✅" if status == "Approuvé" else "❌"
         notifier_user(
             conge.employee.user,
             f"{emoji} Votre demande de congé du {conge.date_debut} au {conge.date_fin} a été {status}."
         )
-
     messages.success(request, f'Statut: {status}')
     return redirect('conge_list')
 
@@ -347,14 +329,11 @@ def paie_add(request):
         form = BulletinForm(request.POST)
         if form.is_valid():
             bulletin = form.save()
-
-            # 🔔 Notification Employé : nouveau bulletin de paie
             if bulletin.employee.user:
                 notifier_user(
                     bulletin.employee.user,
                     f"💰 Votre bulletin de paie de {bulletin.mois}/{bulletin.annee} est disponible."
                 )
-
             messages.success(request, 'Bulletin créé.')
             return redirect('paie_list')
     else:
@@ -396,23 +375,20 @@ def prediction_add(request):
     if request.method == 'POST' and form.is_valid():
         try:
             from .ml_predictor import predict_attrition
-            data    = form.cleaned_data
+            data              = form.cleaned_data
             resultat, score, status = predict_attrition(data)
-            modele  = ModelePrediction.objects.filter(actif=True).first()
-            pred = Prediction.objects.create(
+            modele            = ModelePrediction.objects.filter(actif=True).first()
+            Prediction.objects.create(
                 employee=data['employee'], score=score,
                 resultat=resultat, status=status,
                 date_prediction=date.today(), modele=modele,
             )
             result = {'employee': data['employee'], 'resultat': resultat, 'score': score, 'status': status}
-
-            # 🔔 Notification Employé : nouvelle prédiction
             if data['employee'].user:
                 notifier_user(
                     data['employee'].user,
                     f"🔮 Une prédiction a été effectuée sur votre profil : {resultat} ({score}%)"
                 )
-
             messages.success(request, f"Prédiction: {resultat} ({score}%)")
         except FileNotFoundError:
             messages.error(request, "Modèle ML introuvable.")
@@ -470,9 +446,9 @@ def admin_rh_add(request):
         email    = request.POST.get('email')
         password = request.POST.get('password')
         if User.objects.filter(username=username).exists():
-            messages.error(request, 'Ce nom d\'utilisateur existe déjà.')
+            messages.error(request, "Ce nom d'utilisateur existe déjà.")
         else:
-            user = User.objects.create_user(username=username, email=email, password=password)
+            user          = User.objects.create_user(username=username, email=email, password=password)
             user.is_staff = True
             user.save()
             messages.success(request, f'Compte RH "{username}" créé.')
@@ -501,88 +477,65 @@ def espace_employe(request):
         messages.error(request, "Aucun profil employé associé à ce compte.")
         return redirect('dashboard')
 
-    conges    = CongeRequest.objects.filter(employee=employee).order_by('-created_at')
-    documents = Document.objects.filter(employee=employee)
-    bulletins = BulletinPaie.objects.filter(employee=employee).order_by('-annee', '-mois')
-    departments = Department.objects.all()
-
+    conges        = CongeRequest.objects.filter(employee=employee).order_by('-created_at')
+    documents     = Document.objects.filter(employee=employee)
+    bulletins     = BulletinPaie.objects.filter(employee=employee).order_by('-annee', '-mois')
+    departments   = Department.objects.all()
     conge_form    = CongeForm()
     document_form = DocumentForm()
     employee_form = EmployeeForm(instance=employee)
 
     if request.method == 'POST':
 
-        # 🏖️ Congé
         if 'demande_conge' in request.POST:
             conge_form = CongeForm(request.POST)
             if conge_form.is_valid():
-                conge = conge_form.save(commit=False)
+                conge          = conge_form.save(commit=False)
                 conge.employee = employee
-                conge.status = 'En attente'
+                conge.status   = 'En attente'
                 conge.save()
-
-                # 🔔 Notification RH : demande de congé soumise par l'employé
                 notifier_rh(f"🏖️ {employee.name} a soumis une demande de congé du {conge.date_debut} au {conge.date_fin}.")
-
                 messages.success(request, 'Demande envoyée ✅')
                 return redirect('/mon-espace/?tab=conge')
 
-        # 📄 Document
         elif 'add_document' in request.POST:
-            nom = request.POST.get('nom', '').strip()
+            nom      = request.POST.get('nom', '').strip()
             type_doc = request.POST.get('type_document', '')
-            fichier = request.FILES.get('fichier')
+            fichier  = request.FILES.get('fichier')
             if nom and type_doc and fichier:
-                doc = Document(
-                    employee=employee,
-                    nom=nom,
-                    type_doc=type_doc,
-                    fichier=fichier
-                )
-                doc.save()
-
-                # 🔔 Notification RH : document ajouté par l'employé
+                Document(employee=employee, nom=nom, type_doc=type_doc, fichier=fichier).save()
                 notifier_rh(f"📄 {employee.name} a ajouté un document : {nom}")
-
                 messages.success(request, 'Document ajouté ✅')
             else:
                 messages.error(request, 'Veuillez remplir tous les champs du document.')
             return redirect('/mon-espace/?tab=document')
 
-        # ✏️ Modifier nom + photo (modal)
         elif 'update_nom' in request.POST:
             employee.name = request.POST.get('name')
             if request.FILES.get('photo'):
                 employee.photo = request.FILES['photo']
             employee.save()
-
-            # 🔔 Notification RH : employé a modifié son profil
             notifier_rh(f"✏️ {employee.name} a modifié son profil.")
-
             messages.success(request, 'Profil modifié ✅')
             return redirect('espace_employe')
 
-        # 👤 Modifier toutes les infos
         elif 'update_info' in request.POST:
             employee_form = EmployeeForm(request.POST, request.FILES, instance=employee)
             if employee_form.is_valid():
                 employee_form.save()
-
-                # 🔔 Notification RH : employé a mis à jour ses infos
                 notifier_rh(f"✏️ {employee.name} a mis à jour ses informations personnelles.")
-
                 messages.success(request, 'Informations mises à jour ✅')
                 return redirect('espace_employe')
 
     return render(request, 'employees/espace_employe.html', {
-        'employee': employee,
-        'conges': conges,
-        'documents': documents,
-        'bulletins': bulletins,
-        'conge_form': conge_form,
+        'employee':      employee,
+        'conges':        conges,
+        'documents':     documents,
+        'bulletins':     bulletins,
+        'conge_form':    conge_form,
         'document_form': document_form,
         'employee_form': employee_form,
-        'departments': departments,
+        'departments':   departments,
     })
 
 
@@ -606,8 +559,8 @@ def notifications_api(request):
     ).order_by('-created_at')[:20]
 
     data = [{
-        'id': n.id,
-        'message': n.message,
+        'id':         n.id,
+        'message':    n.message,
         'created_at': n.created_at.strftime('%d/%m/%Y %H:%M'),
     } for n in notifs]
 
@@ -619,4 +572,3 @@ def notifications_mark_read(request):
     """Marque toutes les notifications comme lues"""
     Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
     return JsonResponse({'status': 'ok'})
-  

@@ -1,199 +1,374 @@
 {% extends 'employees/base_rh.html' %}
 
-{% block title %}Tableau de Bord{% endblock %}
+{% block title %}Tableau de Bord RH{% endblock %}
 
 {% block content %}
-
 <style>
-
-/* ===== STATS GRID COMPACT ===== */
+/* ══ STATS GRID — 4 colonnes égales ══ */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
 .stat-card {
-  padding: 8px;
-  border-radius: 8px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 18px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  border-left: 4px solid transparent;
+  transition: transform .15s, box-shadow .15s;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.1); }
+
+.stat-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
 }
 
-.stat-number {
-  font-size: 15px;
-  font-weight: bold;
+.stat-card.blue   { border-left-color: #3b82f6; }
+.stat-card.blue   .stat-icon { background: #eff6ff; }
+.stat-card.purple { border-left-color: #8b5cf6; }
+.stat-card.purple .stat-icon { background: #f5f3ff; }
+.stat-card.green  { border-left-color: #10b981; }
+.stat-card.green  .stat-icon { background: #f0fdf4; }
+.stat-card.orange { border-left-color: #f97316; }
+.stat-card.orange .stat-icon { background: #fff7ed; }
+
+.stat-number { font-size: 22px; font-weight: 700; color: #0f172a; line-height: 1; }
+.stat-label  { font-size: 11px; color: #64748b; margin-top: 3px; font-weight: 500; text-transform: uppercase; letter-spacing: .4px; }
+
+/* ══ GRILLES ══ */
+.grid-4-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
-.stat-label {
-  font-size: 11px;
-  color: #6b7280;
-}
-
-.stat-card.blue   { background: #e0f2fe; color: #2563eb; }
-.stat-card.purple { background: #f3e8ff; color: #7c3aed; }
-
-/* ===== GRID ===== */
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+  margin-bottom: 16px;
 }
 
-/* ===== CARD ===== */
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+/* ══ CARD GÉNÉRIQUE ══ */
 .card {
   background: #fff;
-  padding: 12px;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .section-title {
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 12px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
-/* ===== CHART — TAILLE RÉDUITE ===== */
+.section-title a {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: none;
+  color: #6366f1;
+  text-decoration: none;
+}
+.section-title a:hover { text-decoration: underline; }
+
+/* ══ CHART ══ */
 .chart-wrap {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
-/* ← SEULE MODIFICATION : canvas 80×80 au lieu de 130×130 */
 #deptChart {
   width: 80px !important;
   height: 80px !important;
   flex-shrink: 0;
 }
 
+.dept-legend { flex: 1; }
+
 .dept-item {
   display: flex;
   align-items: center;
   font-size: 12px;
   padding: 3px 0;
+  gap: 6px;
 }
 
 .dept-dot {
-  width: 8px;
-  height: 8px;
+  width: 8px; height: 8px;
   border-radius: 50%;
-  margin-right: 6px;
+  flex-shrink: 0;
 }
 
-/* ===== TABLE ===== */
-.table-wrap table {
-  width: 100%;
-  border-collapse: collapse;
+/* ══ LISTE ITEMS (congés, bulletins, prédictions, employés) ══ */
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13px;
+}
+.list-item:last-child { border-bottom: none; }
+
+.list-item-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #1e293b;
 }
 
-.table-wrap th,
-.table-wrap td {
-  padding: 6px;
-  font-size: 12px;
+.list-item-sub {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 1px;
 }
 
-/* ===== BADGES ===== */
+.avatar-xs {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ══ BADGES ══ */
 .badge {
-  padding: 3px 7px;
+  padding: 3px 8px;
   font-size: 11px;
   border-radius: 6px;
+  font-weight: 600;
+  white-space: nowrap;
 }
-
 .badge-green  { background: #d1fae5; color: #065f46; }
 .badge-red    { background: #fee2e2; color: #991b1b; }
 .badge-orange { background: #ffedd5; color: #9a3412; }
+.badge-blue   { background: #dbeafe; color: #1d4ed8; }
+.badge-gray   { background: #f1f5f9; color: #64748b; }
 
+/* ══ SCORE BAR ══ */
+.score-wrap { display: flex; align-items: center; gap: 8px; }
+.score-num  { font-size: 12px; font-weight: 700; width: 32px; flex-shrink: 0; }
+.score-track { flex: 1; background: #f1f5f9; border-radius: 99px; height: 6px; overflow: hidden; }
+.score-fill  { height: 100%; border-radius: 99px; }
+
+/* ══ RESPONSIVE ══ */
+@media (max-width: 1200px) {
+  .grid-4-sections { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .grid-3     { grid-template-columns: 1fr 1fr; }
+  .grid-2     { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .stats-grid       { grid-template-columns: 1fr 1fr; }
+  .grid-4-sections  { grid-template-columns: 1fr; }
+  .grid-3           { grid-template-columns: 1fr; }
+}
 </style>
 
-<h2>Tableau de bord</h2>
-<br>
+<!-- ══ TITRE ══ -->
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+  <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin:0;">Tableau de bord</h2>
+  <span style="font-size:12px;color:#94a3b8;">Vue RH</span>
+</div>
 
-<!-- ===== STATS ===== -->
+<!-- ══ KPI CARDS ══ -->
 <div class="stats-grid">
-
   <div class="stat-card blue">
+   
     <div>
       <div class="stat-number">{{ total_employees }}</div>
       <div class="stat-label">Employés</div>
     </div>
   </div>
-
-  <div class="stat-card purple">
+  <div class="stat-card orange">
+ 
     <div>
       <div class="stat-number">{{ total_conges }}</div>
-      <div class="stat-label">Demandes</div>
+      <div class="stat-label">Congés en attente</div>
     </div>
   </div>
-
-  <div class="stat-card blue">
+  <div class="stat-card green">
+  
     <div>
       <div class="stat-number">{{ total_bulletins }}</div>
-      <div class="stat-label">Bulletins</div>
+      <div class="stat-label">Bulletins de paie</div>
     </div>
   </div>
-
   <div class="stat-card purple">
+    
     <div>
       <div class="stat-number">{{ total_predictions }}</div>
       <div class="stat-label">Prédictions</div>
     </div>
   </div>
-
 </div>
 
-<br>
+<!-- ══ LIGNE 1 : Statistiques + Congés + Bulletins ══ -->
+<div class="grid-3">
 
-<!-- ===== GRID ===== -->
-<div class="grid-2">
-
-  <!-- ===== CHART ===== -->
+  <!-- Statistiques par département -->
   <div class="card">
-    <div class="section-title">Statistiques des Employés</div>
-
+    <div class="section-title">
+      Statistiques employés
+      <a href="{% url 'employee_list' %}">Voir →</a>
+    </div>
     <div class="chart-wrap">
-      <!-- ← width/height réduits à 80 -->
       <canvas id="deptChart" width="80" height="80"></canvas>
-
-      <div>
+      <div class="dept-legend">
         {% for d in dept_data %}
         <div class="dept-item">
-          <div class="dept-dot"></div>
-          <span>{{ d.name }}</span>
-          <strong style="margin-left:auto">{{ d.pct }}%</strong>
+          <div class="dept-dot dept-dot-{{ forloop.counter }}"></div>
+          <span style="flex:1;">{{ d.name }}</span>
+          <strong>{{ d.pct }}%</strong>
         </div>
         {% endfor %}
       </div>
     </div>
   </div>
 
-  <!-- ===== CONGES ===== -->
+  <!-- Congés récents -->
   <div class="card">
     <div class="section-title">
-      Demandes Récentes
-      <a href="{% url 'conge_list' %}" class="badge">Voir</a>
+      Congés récents
+      <a href="{% url 'conge_list' %}">Voir →</a>
     </div>
-
     {% for c in recent_conges %}
-    <div style="display:flex;justify-content:space-between;padding:6px 0;">
-      <span>{{ c.employee.name }}</span>
-
-      {% if c.status == 'Approuvé' %}
-        <span class="badge badge-green">{{ c.status }}</span>
-      {% elif c.status == 'Refusé' %}
-        <span class="badge badge-red">{{ c.status }}</span>
-      {% else %}
-        <span class="badge badge-orange">{{ c.status }}</span>
-      {% endif %}
+    <div class="list-item">
+      <div class="list-item-name">
+        <div class="avatar-xs">{{ c.employee.name|first|upper }}</div>
+        <div>
+          <div>{{ c.employee.name }}</div>
+          <div class="list-item-sub">{{ c.date_debut }} – {{ c.date_fin }}</div>
+        </div>
+      </div>
+      {% if c.status == 'Approuvé' %}<span class="badge badge-green">Approuvé</span>
+      {% elif c.status == 'Refusé' %}<span class="badge badge-red">Refusé</span>
+      {% else %}<span class="badge badge-orange">En attente</span>{% endif %}
     </div>
     {% empty %}
-      <p>Aucune demande</p>
+    <p style="color:#94a3b8;font-size:12px;text-align:center;padding:12px 0;">Aucune demande</p>
     {% endfor %}
+  </div>
+
+  <!-- Bulletins récents -->
+  <div class="card">
+    <div class="section-title">
+      Bulletins récents
+      <a href="{% url 'paie_list' %}">Voir →</a>
+    </div>
+    {% for b in recent_bulletins %}
+    <div class="list-item">
+      <div class="list-item-name">
+        <div class="avatar-xs" style="background:linear-gradient(135deg,#10b981,#34d399);">{{ b.employee.name|first|upper }}</div>
+        <div>
+          <div>{{ b.employee.name }}</div>
+          <div class="list-item-sub">{{ b.mois }}/{{ b.annee }}</div>
+        </div>
+      </div>
+      <span class="badge badge-green">{{ b.salaire_net|default:b.salaire_brut }} MAD</span>
+    </div>
+    {% empty %}
+    <p style="color:#94a3b8;font-size:12px;text-align:center;padding:12px 0;">Aucun bulletin</p>
+    {% endfor %}
+  </div>
+
+</div>
+
+<!-- ══ LIGNE 2 : Employés + Prédictions ══ -->
+<div class="grid-2">
+
+  <!-- Employés récents -->
+  <div class="card">
+    <div class="section-title">
+      Employés récents
+      <a href="{% url 'employee_list' %}">Voir tout →</a>
+    </div>
+    {% for emp in recent_employees %}
+    <div class="list-item">
+      <div class="list-item-name">
+        <div class="avatar-xs" style="background:linear-gradient(135deg,#f97316,#fb923c);">{{ emp.name|first|upper }}</div>
+        <div>
+          <div>{{ emp.name }}</div>
+          <div class="list-item-sub">{{ emp.poste|default:"—" }}</div>
+        </div>
+      </div>
+      <span class="badge badge-blue">{{ emp.department.name|default:"—" }}</span>
+    </div>
+    {% empty %}
+    <p style="color:#94a3b8;font-size:12px;text-align:center;padding:12px 0;">Aucun employé récent</p>
+    {% endfor %}
+  </div>
+
+  <!-- Prédictions récentes -->
+  <div class="card">
+    <div class="section-title">
+      Prédictions IA récentes
+      <a href="{% url 'prediction_list' %}">Voir →</a>
+    </div>
+    {% for p in recent_predictions %}
+    <div class="list-item">
+      <div class="list-item-name">
+        <div class="avatar-xs" style="background:linear-gradient(135deg,#8b5cf6,#6366f1);">{{ p.employee.name|first|upper }}</div>
+        <div>
+          <div>{{ p.employee.name }}</div>
+          <div class="list-item-sub">{{ p.date_prediction }}</div>
+        </div>
+      </div>
+      <div style="text-align:right;min-width:100px;">
+        <div class="score-wrap">
+          <span class="score-num">{{ p.score }}%</span>
+          <div class="score-track">
+            <div class="score-fill" style="width:{{ p.score }}%;background:{% if p.score >= 70 %}#ef4444{% elif p.score >= 40 %}#f97316{% else %}#10b981{% endif %};"></div>
+          </div>
+        </div>
+        <div style="margin-top:4px;">
+          {% if p.status == 'Satisfaisant' %}<span class="badge badge-green">OK</span>
+          {% elif p.status == 'À surveiller' %}<span class="badge badge-orange">⚠ Risque</span>
+          {% else %}<span class="badge badge-gray">—</span>{% endif %}
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p style="color:#94a3b8;font-size:12px;text-align:center;padding:12px 0;">Aucune prédiction</p>
+    {% endfor %}
+    <div style="margin-top:14px;">
+      <a href="{% url 'prediction_add' %}"
+         style="display:block;text-align:center;padding:9px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-radius:10px;font-size:12px;font-weight:600;text-decoration:none;">
+        + Lancer une prédiction IA
+      </a>
+    </div>
   </div>
 
 </div>
@@ -202,33 +377,32 @@
 
 {% block extra_js %}
 <script>
-const colors = ['#2563eb','#7c3aed','#2563eb','#7c3aed','#2563eb'];
-
+const colors = ['#3b82f6','#8b5cf6','#10b981','#f97316','#ef4444','#06b6d4'];
 const deptData = {{ dept_data|safe }};
 
-document.querySelectorAll('.dept-dot').forEach((el, i) => {
-  el.style.background = colors[i % colors.length];
+colors.forEach((c, i) => {
+  const el = document.querySelector(`.dept-dot-${i+1}`);
+  if (el) el.style.background = c;
 });
 
 const ctx = document.getElementById('deptChart').getContext('2d');
-
 new Chart(ctx, {
   type: 'doughnut',
   data: {
     labels: deptData.map(d => d.name),
     datasets: [{
       data: deptData.map(d => d.count),
-      backgroundColor: colors,
-      borderWidth: 2
+      backgroundColor: colors.slice(0, deptData.length),
+      borderWidth: 2,
+      borderColor: '#fff'
     }]
   },
   options: {
-    cutout: '70%',
-    responsive: false,        /* ← ajouté */
-    maintainAspectRatio: false, /* ← ajouté */
-    plugins: {
-      legend: { display: false }
-    }
+    cutout: '68%',
+    responsive: false,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    animation: { duration: 700 }
   }
 });
 </script>
