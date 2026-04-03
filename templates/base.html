@@ -54,7 +54,7 @@
       width: 45px; 
       height: 45px; 
       border-radius: 10px;
-      background: white;
+      
       padding: 3px;
     }
 
@@ -560,18 +560,7 @@
           <img src="{% static 'css/image/info-24.png' %}" class="nav-icon-img" alt=""> 
           <span>Mes infos</span>
         </a>
-        <a href="#" onclick="showTab('salaire')" class="nav-item">
-          <img src="{% static 'css/image/money.png' %}" class="nav-icon-img" alt=""> 
-          <span>Salaire</span>
-        </a>
-        <a href="#" onclick="showTab('conge')" class="nav-item">
-          <img src="{% static 'css/image/congé.png' %}" class="nav-icon-img" alt=""> 
-          <span>Congé</span>
-        </a>
-        <a href="#" onclick="showTab('document')" class="nav-item">
-          <img src="{% static 'css/image/documents.png' %}" class="nav-icon-img" alt=""> 
-          <span>Documents</span>
-        </a>
+       
       {% else %}
         <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
          <i class="bi bi-speedometer2"></i>
@@ -595,10 +584,7 @@
 
 
 
-<a href="{% url 'prediction_list' %}" class="nav-item">
-  <i class="bi bi-graph-up-arrow"></i>
-  Prédictions
-</a>
+
 
 
     </nav>
