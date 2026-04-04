@@ -9,12 +9,12 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* ────────────── LAYOUT PRINCIPAL ────────────── */
+  
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f9fafb; min-height: 100vh; }
     .layout { display: flex; min-height: 100vh; }
 
-    /* ────────────── SIDEBAR GAUCHE ────────────── */
+   
     .sidebar {
       width: 260px;
       background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
@@ -54,7 +54,6 @@
     }
     .nav-icon-img { width: 22px; height: 22px; object-fit: contain; }
 
-    /* User dans sidebar */
     .sidebar-user { 
       padding: 20px; display: flex; align-items: center; gap: 12px; 
       border-top: 1px solid #374151; background: #111827;
@@ -69,10 +68,10 @@
     .sidebar-user-name { font-weight: 600; font-size: 0.9rem; color: #fff; }
     .sidebar-user-role { font-size: 0.75rem; color: #9ca3af; }
 
-    /* ────────────── MAIN CONTENT DROITE ────────────── */
+   
     .main { flex: 1; display: flex; flex-direction: column; margin-left: 260px; }
 
-    /* ────────────── HEADER HORIZONTAL ────────────── */
+   
     .topbar {
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 30px; height: 70px;
@@ -83,7 +82,6 @@
     .topbar-title { flex: 1; text-align: center; font-size: 20px; font-weight: 700; color: #1f2937; }
     .topbar-actions { display: flex; align-items: center; gap: 15px; }
 
-    /* Bouton notification */
     .notif-btn {
       position: relative; width: 45px; height: 45px;
       border-radius: 12px; background: #f3f4f6;
@@ -100,7 +98,7 @@
       border: 2px solid white;
     }
 
-    /* Bouton déconnexion */
+  
     .btn-logout {
       display: flex; align-items: center; gap: 8px;
       padding: 10px 20px;
@@ -114,7 +112,7 @@
       box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
     }
 
-    /* ────────────── PANEL NOTIFICATIONS ────────────── */
+    
     #notif-panel {
       display: none; position: absolute; right: 0; top: 55px;
       width: 360px; background: #fff; border-radius: 16px;
@@ -150,10 +148,9 @@
     .notif-item small { color: #9ca3af; font-size: 12px; display: block; margin-top: 4px; }
     #notif-empty { padding: 40px; text-align: center; color: #9ca3af; font-size: 14px; }
 
-    /* ────────────── CONTENT AREA ────────────── */
     .content { flex: 1; padding: 30px; background: #f9fafb; }
 
-    /* Messages */
+   
     .messages .alert { 
       margin-bottom: 20px; padding: 16px 20px;
       border-radius: 12px; font-weight: 500;
@@ -163,9 +160,7 @@
     .alert-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
     .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
 
-    /* ════════════════════════════════════════════════════════════
-       MODAL DÉCONNEXION - STYLE SIMPLE BLANC
-       ════════════════════════════════════════════════════════════ */
+    
     #logoutModal {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.5); z-index: 9999;
@@ -185,7 +180,7 @@
       color: #6b7280; font-size: 15px;
       margin-bottom: 25px; line-height: 1.5;
     }
-    /* BOUTONS SUR UNE SEULE LIGNE */
+
     .modal-actions {
       display: flex; gap: 12px;
       justify-content: center; align-items: center;
@@ -209,7 +204,7 @@
     }
     .btn-cancel:hover { background: #f9fafb; border-color: #d1d5db; }
 
-    /* ────────────── RESPONSIVE ────────────── */
+    
     @media (max-width: 1024px) {
       .sidebar { width: 80px; }
       .sidebar-logo h1, .nav-item span, .sidebar-user-info { display: none; }
@@ -236,7 +231,6 @@
 <body>
 <div class="layout">
 
-  <!-- ────────────── SIDEBAR GAUCHE ────────────── -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <img src="{% static 'css/image/Roster.png' %}" alt="Logo">
@@ -271,7 +265,6 @@
       {% endif %}
     </nav>
 
-    <!-- User Info -->
     <div class="sidebar-user">
       <div class="avatar-sm">{{ request.user.username|first|upper }}</div>
       <div class="sidebar-user-info">
@@ -285,15 +278,14 @@
     </div>
   </aside>
 
-  <!-- ────────────── MAIN CONTENT DROITE ────────────── -->
+
   <div class="main">
 
-    <!-- HEADER HORIZONTAL -->
     <header class="topbar">
       <div class="topbar-title">{% block page_title %}{% endblock %}</div>
       
       <div class="topbar-actions">
-        <!-- Notifications -->
+
         <div style="position: relative;">
           <button class="notif-btn" id="notif-btn" onclick="toggleNotifications()">
            <i class="bi bi-bell-fill" style="color:#8b5cf6; font-size:20px;"></i>
@@ -314,7 +306,6 @@
           </div>
         </div>
         
-        <!-- Déconnexion -->
         <button onclick="openLogoutModal()" class="btn-logout">
           <i class="bi bi-box-arrow-right"></i>
           <span>Déconnexion</span>
@@ -322,7 +313,6 @@
       </div>
     </header>
 
-    <!-- CONTENT -->
     <div class="content">
       {% if messages %}
         <div class="messages">
@@ -337,15 +327,11 @@
   </div>
 </div>
 
-<!-- ════════════════════════════════════════════════════════════
-     MODAL DÉCONNEXION - STYLE SIMPLE
-     ════════════════════════════════════════════════════════════ -->
 <div id="logoutModal" onclick="closeLogoutModalOutside(event)">
   <div class="modal-content">
     <h3>Déconnexion</h3>
     <p>Êtes-vous sûr de vouloir vous déconnecter ?</p>
-    
-    <!-- BOUTONS ALIGNÉS SUR UNE SEULE LIGNE -->
+  
     <div class="modal-actions">
       <form method="post" action="{% url 'logout' %}" style="margin:0;">
         {% csrf_token %}
@@ -363,7 +349,7 @@
 {% block extra_js %}{% endblock %}
 
 <script>
-/* ────────────── GESTION MODAL DÉCONNEXION ────────────── */
+
 function openLogoutModal(){
   document.getElementById('logoutModal').style.display='flex';
 }
@@ -378,14 +364,14 @@ function closeLogoutModalOutside(event){
   }
 }
 
-// Fermer avec Echap
+
 document.addEventListener('keydown', function(e){
   if(e.key === 'Escape'){
     closeLogoutModal();
   }
 });
 
-/* ────────────── NOTIFICATIONS ────────────── */
+
 function loadNotifications(){
   fetch("{% url 'notifications_api' %}")
   .then(r => r.json())
@@ -442,7 +428,7 @@ function markAllRead(){
   .catch(err => console.error('Erreur:', err));
 }
 
-// Fermer notifications en cliquant ailleurs
+
 document.addEventListener('click', e => {
   const btn = document.getElementById('notif-btn');
   const panel = document.getElementById('notif-panel');
@@ -451,7 +437,7 @@ document.addEventListener('click', e => {
   }
 });
 
-// Charger notifications au démarrage
+
 loadNotifications();
 setInterval(loadNotifications, 30000);
 </script>

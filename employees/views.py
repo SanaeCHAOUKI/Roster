@@ -18,10 +18,6 @@ def is_admin(user):
 def is_rh(user):
     return user.is_staff or user.is_superuser
 
-
-# ══════════════════════════════════════════════════════════════
-#  UTILITAIRE — Envoyer une notification
-# ══════════════════════════════════════════════════════════════
 def notifier_rh(message):
     """Envoie une notification à tous les utilisateurs RH (is_staff, non superuser)"""
     rh_users = User.objects.filter(is_staff=True, is_superuser=False)
@@ -35,9 +31,7 @@ def notifier_user(user, message):
         Notification.objects.create(user=user, message=message)
 
 
-# ══════════════════════════════════════════════════════════════
-#  LOGIN / LOGOUT
-# ══════════════════════════════════════════════════════════════
+
 def login_view(request):
     if request.user.is_authenticated:
         if request.user.is_superuser:
@@ -75,7 +69,7 @@ def login_view(request):
 
             elif role == 'employe':
                 try:
-                    emp = user.employee  # lève RelatedObjectDoesNotExist si pas lié
+                    emp = user.employee 
                     if emp is not None:
                         login(request, user)
                         return redirect('espace_employe')
@@ -97,9 +91,6 @@ def logout_view(request):
     return redirect('login')
 
 
-# ══════════════════════════════════════════════════════════════
-#  DASHBOARD ADMIN
-# ══════════════════════════════════════════════════════════════
 @login_required
 def dashboard(request):
     employees   = Employee.objects.all()
@@ -128,9 +119,7 @@ def dashboard(request):
     return render(request, 'employees/dashboard.html', context)
 
 
-# ══════════════════════════════════════════════════════════════
-#  PAGE RH  ← recent_employees ajouté ici
-# ══════════════════════════════════════════════════════════════
+
 @login_required
 def page_rh(request):
     """Tableau de bord pour le RH."""
@@ -156,15 +145,13 @@ def page_rh(request):
         'recent_conges':      conges.order_by('-created_at')[:3],
         'recent_bulletins':   bulletins.order_by('-annee', '-mois')[:3],
         'recent_predictions': predictions.order_by('-created_at')[:3],
-        'recent_employees':   employees.select_related('department').order_by('-date_embauche')[:5],  # ← AJOUTÉ
+        'recent_employees':   employees.select_related('department').order_by('-date_embauche')[:5],
         'dept_data':          dept_data,
     }
     return render(request, 'employees/page_rh.html', context)
 
 
-# ══════════════════════════════════════════════════════════════
-#  EMPLOYÉS
-# ══════════════════════════════════════════════════════════════
+
 @login_required
 def employee_list(request):
     q = request.GET.get('q', '')
@@ -204,9 +191,9 @@ def employee_edit(request, pk):
         form = EmployeeForm(request.POST, request.FILES, instance=emp)
         if form.is_valid():
             form.save()
-            notifier_rh(f"✏️ Fiche de l'employé modifiée : {emp.name}")
+            notifier_rh(f" Fiche de l'employé modifiée : {emp.name}")
             if emp.user:
-                notifier_user(emp.user, "✏️ Votre profil a été mis à jour par les RH.")
+                notifier_user(emp.user, " Votre profil a été mis à jour par les RH.")
             messages.success(request, 'Employé mis à jour.')
             return redirect('employee_list')
     else:
@@ -245,9 +232,6 @@ def employee_data_api(request, pk):
     return JsonResponse(data)
 
 
-# ══════════════════════════════════════════════════════════════
-#  DOCUMENTS
-# ══════════════════════════════════════════════════════════════
 @login_required
 def document_add(request, emp_pk):
     emp = get_object_or_404(Employee, pk=emp_pk)
@@ -276,9 +260,7 @@ def document_delete(request, pk):
     return redirect('employee_detail', pk=emp_pk)
 
 
-# ══════════════════════════════════════════════════════════════
-#  CONGÉS
-# ══════════════════════════════════════════════════════════════
+
 @login_required
 def conge_list(request):
     conges = CongeRequest.objects.select_related('employee').order_by('-created_at')
@@ -292,10 +274,9 @@ def conge_add(request):
         if form.is_valid():
             conge = form.save(commit=False)
 
-            # 🔥 lier automatiquement l'utilisateur
             conge.employee = request.user.employee
 
-            # 🔥 statut automatique
+      
             conge.status = "En attente"
 
             conge.save()
@@ -328,9 +309,7 @@ def conge_update_status(request, pk, status):
     return redirect('conge_list')
 
 
-# ══════════════════════════════════════════════════════════════
-#  PAIE
-# ══════════════════════════════════════════════════════════════
+
 @login_required
 def paie_list(request):
     bulletins = BulletinPaie.objects.select_related('employee').order_by('-annee', '-mois')
@@ -346,7 +325,7 @@ def paie_add(request):
             if bulletin.employee.user:
                 notifier_user(
                     bulletin.employee.user,
-                    f"💰 Votre bulletin de paie de {bulletin.mois}/{bulletin.annee} est disponible."
+                    f" Votre bulletin de paie de {bulletin.mois}/{bulletin.annee} est disponible."
                 )
             messages.success(request, 'Bulletin créé.')
             return redirect('paie_list')
@@ -364,9 +343,6 @@ def paie_delete(request, pk):
     return redirect('paie_list')
 
 
-# ══════════════════════════════════════════════════════════════
-#  PRÉDICTIONS
-# ══════════════════════════════════════════════════════════════
 @login_required
 def prediction_list(request):
     predictions = Prediction.objects.select_related('employee').order_by('-created_at')
@@ -411,13 +387,26 @@ def prediction_add(request):
     return render(request, 'employees/prediction_add.html', {'form': form, 'result': result})
 
 
-# ══════════════════════════════════════════════════════════════
-#  MODÈLE PRÉDICTION
-# ══════════════════════════════════════════════════════════════
+
+
+from django.shortcuts import render
+from .models import ModelePrediction
+from django.contrib.auth.decorators import login_required
+
 @login_required
 def modele_list(request):
-    modeles = ModelePrediction.objects.all().order_by('-date_entrainement')
-    return render(request, 'employees/modele_list.html', {'modeles': modeles})
+    modeles = ModelePrediction.objects.all()
+
+   
+    if request.user.is_superuser:
+        base_template = "base.html"
+    else:
+        base_template = "employees/base_rh.html"
+
+    return render(request, "employees/modele_list.html", {
+        "modeles": modeles,
+        "base_template": base_template
+    })
 
 
 @login_required
@@ -442,9 +431,7 @@ def modele_delete(request, pk):
     return redirect('modele_list')
 
 
-# ══════════════════════════════════════════════════════════════
-#  ADMIN — Gestion des comptes RH
-# ══════════════════════════════════════════════════════════════
+
 @login_required
 @user_passes_test(is_admin)
 def admin_rh_list(request):
@@ -480,9 +467,6 @@ def admin_rh_delete(request, pk):
     return redirect('admin_rh_list')
 
 
-# ══════════════════════════════════════════════════════════════
-#  ESPACE EMPLOYÉ
-# ══════════════════════════════════════════════════════════════
 @login_required
 def espace_employe(request):
     try:
@@ -553,18 +537,13 @@ def espace_employe(request):
     })
 
 
-# ══════════════════════════════════════════════════════════════
-#  SUPPRESSION DOCUMENT (espace employé)
-# ══════════════════════════════════════════════════════════════
+
 def delete_document(request, doc_id):
     doc = get_object_or_404(Document, id=doc_id)
     doc.delete()
     return redirect('/mon-espace/?tab=document')
 
 
-# ══════════════════════════════════════════════════════════════
-#  NOTIFICATIONS API
-# ══════════════════════════════════════════════════════════════
 @login_required
 def notifications_api(request):
     """Retourne les notifications non lues de l'utilisateur connecté"""

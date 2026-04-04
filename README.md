@@ -1,112 +1,101 @@
-# 💼 RH App – Application de Gestion des Ressources Humaines
+# Roster – Application de Gestion des Ressources Humaines
 
-Application Django complète de gestion RH avec tableau de bord, gestion des employés, congés, paie et prédictions.
+Roster est une application web Django développée dans le cadre d'un Projet de Fin d'Études. Elle permet aux responsables RH de gérer les employés, les congés, la paie et de prédire les risques de départ grâce à un modèle de Machine Learning.
 
 ---
 
-## ⚡ Installation Rapide
+## Prérequis
 
-### 1. Cloner / Extraire le projet
+- Python 3.10 ou supérieur
+- pip
+
+
+
+## Installation
+
+Clonez ou extrayez le projet, puis placez-vous dans le dossier :
+
 ```bash
 cd rh_app
 ```
 
-### 2. Créer un environnement virtuel
+Créez et activez un environnement virtuel :
+
 ```bash
 python -m venv venv
-
-# Windows
 venv\Scripts\activate
-
-# Mac/Linux
-source venv/bin/activate
 ```
 
-### 3. Installer les dépendances
+Installez les dépendances :
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Migrations de la base de données
+Appliquez les migrations :
+
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 5. Peupler avec des données de démonstration
+Chargez des données de démonstration :
+
 ```bash
 python seed_data.py
 ```
 
-### 6. Lancer le serveur
+Lancez le serveur :
+
 ```bash
 python manage.py runserver
 ```
 
-### 7. Accéder à l'application
-- **Application** : http://127.0.0.1:8000/
-- **Admin Django** : http://127.0.0.1:8000/admin/
-- **Identifiants** : `admin` / `admin123`
+L'application est accessible sur http://127.0.0.1:8000/
 
----
 
-## 📁 Structure du Projet
 
-```
+## Connexion
+
+| Profil  | Rôle                        |
+|---------|-----------------------------|
+| Admin   | Gestion complète du système |
+| RH      | Gestion RH et prédictions   |
+| Employé | Espace personnel            |
+
+Identifiants par défaut : `admin` / `admin123`
+
+
+
+## Fonctionnalités
+
+- Tableau de bord avec statistiques et graphiques
+- Gestion des employés (ajout, modification, suppression, recherche)
+- Gestion des congés (demandes, validation, suivi)
+- Gestion de la paie (bulletins détaillés)
+- Prédiction du risque de départ via régression logistique
+- Gestion des modèles de Machine Learning
+
+
+
+## Technologies
+
+- Python, Django 4.2, SQLite
+- HTML, CSS, JavaScript, Chart.js
+- Scikit-learn, Joblib
+
+
+## Structure
+
 rh_app/
-├── rh_app/              # Configuration Django
-│   ├── settings.py
-│   └── urls.py
-├── employees/           # Application principale
-│   ├── models.py        # Modèles: Employee, Congé, Paie, Prédiction
-│   ├── views.py         # Vues et logique métier
-│   ├── forms.py         # Formulaires
-│   ├── urls.py          # Routes URL
-│   └── admin.py         # Interface admin
-├── templates/           # Templates HTML
-│   ├── base.html        # Layout principal (sidebar + topbar)
-│   ├── registration/
-│   │   └── login.html
-│   └── employees/
-│       ├── dashboard.html
-│       ├── employee_list.html
-│       ├── conge_list.html
-│       ├── paie_list.html
-│       └── prediction_list.html
+├── rh_app/
+├── employees/
+├── templates/
 ├── static/
-│   └── css/style.css    # Styles CSS (design bleu professionnel)
-├── seed_data.py         # Script de données de démonstration
+├── ml_models/
+├── seed_data.py
 ├── requirements.txt
 └── manage.py
-```
 
----
 
-## 🎯 Fonctionnalités
-
-| Module         | Fonctionnalités                                               |
-|----------------|---------------------------------------------------------------|
-| **Dashboard**  | Stats globales, graphique par département, congés récents     |
-| **Employés**   | Liste, recherche, ajout, modification, suppression            |
-| **Congés**     | Demandes, approbation/refus, suivi par statut                 |
-| **Paie**       | Bulletins de paie avec salaire, primes, déductions            |
-| **Prédictions**| Score RH, résultats de prédiction, statut                     |
-
----
-
-## 🛠️ Technologies
-
-- **Backend** : Django 4.2
-- **Base de données** : SQLite (développement) / PostgreSQL (production)
-- **Frontend** : HTML/CSS vanilla + Chart.js
-- **Authentification** : Django Auth intégré
-
----
-
-## 🚀 Mise en Production
-
-1. Changer `SECRET_KEY` dans `settings.py`
-2. Mettre `DEBUG = False`
-3. Configurer `ALLOWED_HOSTS`
-4. Utiliser PostgreSQL
-5. Exécuter `python manage.py collectstatic`
+Projet réalisé par CHAOUKI Sanae, BERKI Khadija et ALLAOUI Fayrouz — EST Oujda, 2025/2026.

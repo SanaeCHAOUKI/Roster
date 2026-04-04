@@ -62,7 +62,7 @@ class MLPredictionForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
-    # Infos personnelles
+  
     Age = forms.IntegerField(label="Âge", min_value=18, max_value=65,
                              widget=forms.NumberInput(attrs={'class': 'form-control'}))
     Gender = forms.ChoiceField(label="Genre", choices=GENDER_CHOICES,
@@ -72,14 +72,14 @@ class MLPredictionForm(forms.Form):
     DistanceFromHome = forms.IntegerField(label="Distance domicile-travail (km)", min_value=1, max_value=100,
                                           widget=forms.NumberInput(attrs={'class': 'form-control'}))
 
-    # Éducation
+   
     Education = forms.ChoiceField(label="Niveau d'éducation (1=Lycée → 5=Doctorat)",
                                   choices=SCALE_1_5,
                                   widget=forms.Select(attrs={'class': 'form-control'}))
     EducationField = forms.ChoiceField(label="Domaine d'éducation", choices=EDUCATION_FIELD_CHOICES,
                                        widget=forms.Select(attrs={'class': 'form-control'}))
 
-    # Poste
+  
     Department = forms.ChoiceField(label="Département", choices=DEPARTMENT_CHOICES,
                                    widget=forms.Select(attrs={'class': 'form-control'}))
     JobRole = forms.ChoiceField(label="Rôle", choices=JOB_ROLE_CHOICES,
@@ -92,7 +92,7 @@ class MLPredictionForm(forms.Form):
     OverTime = forms.ChoiceField(label="Heures supplémentaires", choices=OVERTIME_CHOICES,
                                  widget=forms.Select(attrs={'class': 'form-control'}))
 
-    # Rémunération
+  
     MonthlyIncome = forms.IntegerField(label="Revenu Mensuel ($)", min_value=1000,
                                        widget=forms.NumberInput(attrs={'class': 'form-control'}))
     DailyRate = forms.IntegerField(label="Taux Journalier ($)", min_value=100,
@@ -106,7 +106,7 @@ class MLPredictionForm(forms.Form):
     StockOptionLevel = forms.ChoiceField(label="Options d'actions (0-3)", choices=SCALE_0_3,
                                          widget=forms.Select(attrs={'class': 'form-control'}))
 
-    # Expérience
+   
     TotalWorkingYears = forms.IntegerField(label="Années d'expérience totale", min_value=0,
                                            widget=forms.NumberInput(attrs={'class': 'form-control'}))
     NumCompaniesWorked = forms.IntegerField(label="Nombre d'entreprises précédentes", min_value=0,
@@ -122,7 +122,7 @@ class MLPredictionForm(forms.Form):
     TrainingTimesLastYear = forms.IntegerField(label="Formations cette année", min_value=0, max_value=10,
                                                widget=forms.NumberInput(attrs={'class': 'form-control'}))
 
-    # Satisfaction
+   
     JobSatisfaction = forms.ChoiceField(label="Satisfaction au travail (1-4)", choices=SCALE_1_4,
                                         widget=forms.Select(attrs={'class': 'form-control'}))
     EnvironmentSatisfaction = forms.ChoiceField(label="Satisfaction environnement (1-4)", choices=SCALE_1_4,

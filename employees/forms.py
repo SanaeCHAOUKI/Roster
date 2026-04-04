@@ -28,7 +28,7 @@ class EmployeeForm(forms.ModelForm):
 class CongeForm(forms.ModelForm):
     class Meta:
         model = CongeRequest
-        fields = ['date_debut', 'date_fin', 'motif']  # 🔥 supprimer employee + status
+        fields = ['date_debut', 'date_fin', 'motif'] 
         widgets = {
             'date_debut': forms.DateInput(attrs={'type': 'date'}),
             'date_fin': forms.DateInput(attrs={'type': 'date'}),

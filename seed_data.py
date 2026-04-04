@@ -1,8 +1,4 @@
-#!/usr/bin/env python
-"""
-Script de peuplement de la base de données avec des données de démonstration.
-Exécuter: python seed_data.py
-"""
+
 import os
 import sys
 import django
@@ -15,21 +11,21 @@ django.setup()
 from django.contrib.auth.models import User
 from employees.models import Department, Employee, CongeRequest, BulletinPaie, Prediction
 
-print("🌱 Peuplement de la base de données...")
+print(" Peuplement de la base de données...")
 
-# Superuser
+
 if not User.objects.filter(username='admin').exists():
     User.objects.create_superuser('admin', 'admin@rh.ma', 'admin123')
-    print("✅ Superuser créé: admin / admin123")
+    print(" Superuser créé: admin / admin123")
 
-# Departments
+
 depts = {}
 for name in ['Informatique', 'Marketing', 'Administratif', 'Commercial']:
     d, _ = Department.objects.get_or_create(name=name)
     depts[name] = d
-print("✅ Départements créés")
+print(" Départements créés")
 
-# Employees
+
 employees_data = [
     ('Alice Durant',   'alice@rh.ma',  'Informatique',  'Développeur',         date(2020,3,15),  8500),
     ('Benoît Lefèvre', 'benoit@rh.ma', 'Informatique',  'Chef de Projet',      date(2019,7,1),   11000),
@@ -54,7 +50,7 @@ for name, email, dept, poste, date_emb, salaire in employees_data:
         }
     )
     created_emps.append(emp)
-print(f"✅ {len(created_emps)} employés créés")
+print(f" {len(created_emps)} employés créés")
 
 # Congés
 conges_data = [
@@ -70,7 +66,7 @@ for emp, dd, df, motif, status in conges_data:
         employee=emp, date_debut=dd, date_fin=df,
         defaults={'motif': motif, 'status': status}
     )
-print("✅ Demandes de congé créées")
+print(" Demandes de congé créées")
 
 # Bulletins de paie
 for emp in created_emps[:5]:
@@ -84,7 +80,7 @@ for emp in created_emps[:5]:
                 'net_a_payer': emp.salaire + 300,
             }
         )
-print("✅ Bulletins de paie créés")
+print(" Bulletins de paie créés")
 
 # Prédictions
 predictions_data = [
@@ -100,13 +96,13 @@ for emp, score, resultat, status, date_pred in predictions_data:
         employee=emp, date_prediction=date_pred,
         defaults={'score': score, 'resultat': resultat, 'status': status}
     )
-print("✅ Prédictions créées")
+print(" Prédictions créées")
 
-print("\n🎉 Base de données peuplée avec succès !")
+print("\n Base de données peuplée avec succès !")
 print("   Identifiants: admin / admin123")
 print("   Lancez: python manage.py runserver")
 
-# ModelePrediction
+
 from employees.models import ModelePrediction
 ModelePrediction.objects.get_or_create(
     nom_modele='Logistic Regression',
@@ -118,4 +114,4 @@ ModelePrediction.objects.get_or_create(
         'actif': True,
     }
 )
-print("✅ Modèle ML enregistré")
+print("Modèle ML enregistré")

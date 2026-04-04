@@ -36,7 +36,7 @@ class Employee(models.Model):
     salaire          = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     status           = models.CharField(max_length=10, choices=STATUS_CHOICES, default='actif')
     photo            = models.ImageField(upload_to='employees/', blank=True, null=True)
-    # ML fields
+    
     age                        = models.IntegerField(default=30)
     gender                     = models.CharField(max_length=10, choices=GENDER_CHOICES, default='Male')
     marital_status             = models.CharField(max_length=10, choices=MARITAL_CHOICES, default='Single')
@@ -99,7 +99,7 @@ class Employee(models.Model):
         }
 
 
-# ── Nouveau: Document ──────────────────────────────────────────────────────────
+
 class Document(models.Model):
     TYPE_CHOICES = [
         ('contrat', 'Contrat'), ('cv', 'CV'), ('diplome', 'Diplôme'),
@@ -115,7 +115,7 @@ class Document(models.Model):
         return f"{self.employee.name} – {self.nom}"
 
 
-# ── Nouveau: ModelePrediction ──────────────────────────────────────────────────
+
 class ModelePrediction(models.Model):
     nom_modele       = models.CharField(max_length=100, default='Logistic Regression')
     precision        = models.FloatField(default=0.0)
@@ -131,7 +131,7 @@ class ModelePrediction(models.Model):
         verbose_name = "Modèle de Prédiction"
 
 
-# ── Congé ──────────────────────────────────────────────────────────────────────
+
 class CongeRequest(models.Model):
     STATUS_CHOICES = [('En attente','En attente'),('Approuvé','Approuvé'),('Refusé','Refusé')]
     employee   = models.ForeignKey(Employee, on_delete=models.CASCADE)
@@ -149,7 +149,7 @@ class CongeRequest(models.Model):
         return (self.date_fin - self.date_debut).days + 1
 
 
-# ── Paie ───────────────────────────────────────────────────────────────────────
+
 class BulletinPaie(models.Model):
     employee     = models.ForeignKey(Employee, on_delete=models.CASCADE)
     mois         = models.CharField(max_length=20)
@@ -166,7 +166,7 @@ class BulletinPaie(models.Model):
     def salaire_brut(self):
         return self.salaire_base + self.primes
 
-# ── Prédiction ─────────────────────────────────────────────────────────────────
+
 class Prediction(models.Model):
     STATUS_CHOICES = [('Satisfaisant','Satisfaisant'),('À surveiller','À surveiller'),('En attente','En attente')]
     employee   = models.ForeignKey(Employee, on_delete=models.CASCADE)

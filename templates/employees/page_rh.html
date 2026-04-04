@@ -4,7 +4,7 @@
 
 {% block content %}
 <style>
-/* ══ STATS GRID — 4 colonnes égales ══ */
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -44,7 +44,6 @@
 .stat-number { font-size: 22px; font-weight: 700; color: #0f172a; line-height: 1; }
 .stat-label  { font-size: 11px; color: #64748b; margin-top: 3px; font-weight: 500; text-transform: uppercase; letter-spacing: .4px; }
 
-/* ══ GRILLES ══ */
 .grid-4-sections {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -66,7 +65,7 @@
   margin-bottom: 16px;
 }
 
-/* ══ CARD GÉNÉRIQUE ══ */
+
 .card {
   background: #fff;
   border-radius: 12px;
@@ -97,7 +96,7 @@
 }
 .section-title a:hover { text-decoration: underline; }
 
-/* ══ CHART ══ */
+
 .chart-wrap {
   display: flex;
   align-items: center;
@@ -126,7 +125,7 @@
   flex-shrink: 0;
 }
 
-/* ══ LISTE ITEMS (congés, bulletins, prédictions, employés) ══ */
+
 .list-item {
   display: flex;
   align-items: center;
@@ -161,7 +160,7 @@
   flex-shrink: 0;
 }
 
-/* ══ BADGES ══ */
+
 .badge {
   padding: 3px 8px;
   font-size: 11px;
@@ -175,13 +174,13 @@
 .badge-blue   { background: #dbeafe; color: #1d4ed8; }
 .badge-gray   { background: #f1f5f9; color: #64748b; }
 
-/* ══ SCORE BAR ══ */
+
 .score-wrap { display: flex; align-items: center; gap: 8px; }
 .score-num  { font-size: 12px; font-weight: 700; width: 32px; flex-shrink: 0; }
 .score-track { flex: 1; background: #f1f5f9; border-radius: 99px; height: 6px; overflow: hidden; }
 .score-fill  { height: 100%; border-radius: 99px; }
 
-/* ══ RESPONSIVE ══ */
+
 @media (max-width: 1200px) {
   .grid-4-sections { grid-template-columns: 1fr 1fr; }
 }
@@ -197,13 +196,13 @@
 }
 </style>
 
-<!-- ══ TITRE ══ -->
+
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
   <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin:0;">Tableau de bord</h2>
   <span style="font-size:12px;color:#94a3b8;">Vue RH</span>
 </div>
 
-<!-- ══ KPI CARDS ══ -->
+
 <div class="stats-grid">
   <div class="stat-card blue">
    
@@ -235,10 +234,10 @@
   </div>
 </div>
 
-<!-- ══ LIGNE 1 : Statistiques + Congés + Bulletins ══ -->
+
 <div class="grid-3">
 
-  <!-- Statistiques par département -->
+
   <div class="card">
     <div class="section-title">
       Statistiques employés
@@ -258,7 +257,6 @@
     </div>
   </div>
 
-  <!-- Congés récents -->
   <div class="card">
     <div class="section-title">
       Congés récents
@@ -282,7 +280,6 @@
     {% endfor %}
   </div>
 
-  <!-- Bulletins récents -->
   <div class="card">
     <div class="section-title">
       Bulletins récents
@@ -306,10 +303,8 @@
 
 </div>
 
-<!-- ══ LIGNE 2 : Employés + Prédictions ══ -->
 <div class="grid-2">
 
-  <!-- Employés récents -->
   <div class="card">
     <div class="section-title">
       Employés récents
@@ -331,7 +326,7 @@
     {% endfor %}
   </div>
 
-  <!-- Prédictions récentes -->
+  
   <div class="card">
     <div class="section-title">
       Prédictions IA récentes

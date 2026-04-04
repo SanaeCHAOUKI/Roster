@@ -1,1 +1,0 @@
-web: gunicorn rh_app.wsgi

@@ -6,7 +6,7 @@
 <h1>Prédictions </h1>
 <br>
 <style>
-/* ══ BANNER RÉSULTAT (bandeau vert/rouge en haut) ══ */
+
 .pred-banner {
   padding: 14px 20px;
   border-radius: 10px;
@@ -18,7 +18,7 @@
 .pred-banner.stable { background: #f0fdf4; border-color: #86efac; color: #166534; }
 .pred-banner.risk   { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
 
-/* ══ CARTE RÉSULTAT ══ */
+
 .result-card {
   background: #fff;
   border-radius: 14px;
@@ -36,7 +36,7 @@
   gap: 18px;
 }
 
-/* Icône ronde verte/rouge */
+
 .result-check {
   width: 48px; height: 48px;
   border-radius: 50%;
@@ -53,7 +53,7 @@
 .result-verdict.risk   { color: #dc2626; }
 .result-sub     { font-size: 12px; color: #94a3b8; margin-top: 3px; }
 
-/* Score à droite */
+
 .result-score {
   margin-left: auto;
   text-align: center;
@@ -68,7 +68,7 @@
 .score-pct.high   { color: #ef4444; }
 .score-lbl { font-size: 11px; color: #94a3b8; margin-top: 3px; }
 
-/* Badge Satisfaisant / À surveiller */
+
 .score-badge {
   display: inline-flex; align-items: center; gap: 5px;
   margin-top: 8px;
@@ -78,12 +78,12 @@
 .score-badge.ok      { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
 .score-badge.warning { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; }
 
-/* Barre de progression */
+
 .prog-wrap    { margin-top: 20px; }
 .prog-labels  { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-bottom: 6px; }
 .prog-track   { height: 10px; background: #f1f5f9; border-radius: 99px; overflow: hidden; position: relative; }
 .prog-fill    { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#10b981 0%,#f97316 55%,#ef4444 100%); }
-/* Curseur point orange sur la barre */
+
 .prog-cursor  {
   position: absolute; top: 50%; transform: translate(-50%,-50%);
   width: 12px; height: 12px; border-radius: 50%;
@@ -91,7 +91,6 @@
   box-shadow: 0 0 0 2px #f97316;
 }
 
-/* Alerte risque */
 .risk-alert {
   margin-top: 14px;
   padding: 12px 16px;
@@ -103,10 +102,9 @@
 .risk-alert.medium { background: #fff7ed; color: #9a3412; }
 .risk-alert.high   { background: #fef2f2; color: #991b1b; }
 
-/* Boutons résultat */
+
 .result-btns { display: flex; gap: 10px; margin-top: 20px; }
 
-/* ══ FORM CARD ══ */
 .pred-form-card {
   background: #fff;
   border-radius: 14px;
@@ -118,7 +116,7 @@
 .pred-form-title { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 2px; }
 .pred-form-sub   { font-size: 12px; color: #94a3b8; margin-bottom: 22px; }
 
-/* Section blocs */
+
 .pred-section {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
@@ -137,7 +135,7 @@
   display: flex; align-items: center; justify-content: center;
   font-size: 14px; flex-shrink: 0;
 }
-/* Alternance bleu / violet */
+
 .ico-blue   { background: #eff6ff; color: #3b82f6; }
 .ico-violet { background: #eef2ff; color: #6366f1; }
 
@@ -146,14 +144,13 @@
   text-transform: uppercase; letter-spacing: .5px; color: #0f172a;
 }
 
-/* Grille 2 colonnes */
+
 .pred-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px 20px;
 }
 
-/* Badge chargement */
 .load-badge {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 4px 10px; border-radius: 7px;
@@ -163,7 +160,7 @@
 .load-badge.loading { background: #dbeafe; color: #1d4ed8; }
 .load-badge.done    { background: #d1fae5; color: #065f46; }
 
-/* Actions submit */
+
 .pred-submit {
   display: flex; gap: 12px;
   align-items: center;
@@ -177,22 +174,20 @@
 }
 </style>
 
-<!-- ══ BANDEAU RÉSULTAT ══ -->
+
 {% if result %}
 <div class="pred-banner {% if result.resultat == 'Risque de Départ' %}risk{% else %}stable{% endif %}">
   Prédiction : {% if result.resultat == 'Risque de Départ' %}Risque de Départ{% else %}Reste dans l'entreprise{% endif %} ({{ result.score }}%)
 </div>
 
-<!-- ══ CARTE RÉSULTAT ══ -->
 <div class="result-card {% if result.resultat == 'Risque de Départ' %}risk{% else %}stable{% endif %}">
 
   <div class="result-top">
-    <!-- Icône -->
+   
     <div class="result-check {% if result.resultat == 'Risque de Départ' %}risk{% else %}stable{% endif %}">
       <i class="bi {% if result.resultat == 'Risque de Départ' %}bi-exclamation-lg{% else %}bi-check-lg{% endif %}"></i>
     </div>
 
-    <!-- Nom + verdict -->
     <div>
       <div class="result-name">{{ result.employee.name }}</div>
       <div class="result-verdict {% if result.resultat == 'Risque de Départ' %}risk{% else %}stable{% endif %}">
@@ -205,7 +200,7 @@
       <div class="result-sub">Analyse par régression logistique</div>
     </div>
 
-    <!-- Score -->
+   
     <div class="result-score">
       <div class="score-pct {% if result.score >= 60 %}high{% elif result.score >= 40 %}medium{% else %}low{% endif %}">
         {{ result.score }}%
@@ -225,7 +220,7 @@
     </div>
   </div>
 
-  <!-- Barre de progression -->
+
   <div class="prog-wrap">
     <div class="prog-labels">
       <span><i class="bi bi-circle-fill" style="color:#10b981;font-size:7px;"></i> Faible (0%)</span>
@@ -237,7 +232,7 @@
     </div>
   </div>
 
-  <!-- Alerte niveau de risque -->
+
   <div class="risk-alert {% if result.score >= 70 %}high{% elif result.score >= 40 %}medium{% else %}low{% endif %}">
     <i class="bi {% if result.score >= 70 %}bi-x-octagon-fill{% elif result.score >= 40 %}bi-exclamation-diamond-fill{% else %}bi-shield-check{% endif %}"></i>
     {% if result.score >= 70 %}
@@ -249,7 +244,7 @@
     {% endif %}
   </div>
 
-  <!-- Boutons -->
+ 
   <div class="result-btns">
     <a href="{% url 'prediction_list' %}" class="btn btn-outline btn-sm">
       <i class="bi bi-list-ul"></i> Voir toutes les prédictions
@@ -262,7 +257,7 @@
 </div>
 {% endif %}
 
-<!-- ══ FORMULAIRE ══ -->
+
 <div class="pred-form-card">
   <div class="pred-form-title">
     Formulaire de Prédiction
@@ -272,7 +267,7 @@
   <form method="post" id="predForm">
     {% csrf_token %}
 
-    <!-- Employé -->
+ 
     <div class="pred-section">
       <div class="pred-section-hd">
        
@@ -290,7 +285,7 @@
       </div>
     </div>
 
-    <!-- Informations personnelles -->
+   
     <div class="pred-section">
       <div class="pred-section-hd">
         
@@ -306,7 +301,7 @@
       </div>
     </div>
 
-    <!-- Poste & Travail -->
+
     <div class="pred-section">
       <div class="pred-section-hd">
         
@@ -321,7 +316,6 @@
       </div>
     </div>
 
-    <!-- Rémunération -->
     <div class="pred-section">
       <div class="pred-section-hd">
   
@@ -337,7 +331,6 @@
       </div>
     </div>
 
-    <!-- Expérience -->
     <div class="pred-section">
       <div class="pred-section-hd">
     
@@ -354,7 +347,7 @@
       </div>
     </div>
 
-    <!-- Satisfaction & Performance -->
+   
     <div class="pred-section">
       <div class="pred-section-hd">
       
@@ -373,7 +366,6 @@
       </div>
     </div>
 
-    <!-- Submit -->
     <div class="pred-submit">
       <button type="submit" class="btn btn-primary" style="padding:11px 30px;font-size:14px;">
        Lancer la prédiction
